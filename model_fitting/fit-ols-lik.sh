@@ -19,7 +19,7 @@
 seed=124
 for j in {1..12}
 do
-models/random_waning_ols method=sample algorithm=hmc metric=diag_e engine=nuts max_depth=10 num_warmup=1000 num_samples=1000 adapt engaged=1 delta=0.8 data file="fluvacs.data.R" random seed=$seed id=$j output refresh=25 file="results/ols_age_wane_ek_chain_${j}.csv" &
+../models/random_waning_ols method=sample algorithm=hmc metric=diag_e engine=nuts max_depth=10 num_warmup=1000 num_samples=1000 adapt engaged=1 delta=0.8 data file="../data/fluvacs.data.R" random seed=$seed id=$j output refresh=25 file="../results/chains/ols_age_wane_ek_chain_${j}.csv" &
 
 done
 wait
