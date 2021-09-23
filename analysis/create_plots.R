@@ -9,11 +9,8 @@ library(cmdstanr)
 library(posterior)
 rstan_options(auto_write=T)
 
-set_cmdstan_path("C:/Users/15636/Documents/.cmdstanr/cmdstan-2.26.1")
-
-setwd('C:/Users/15636/Dropbox (University of Michigan)/hai-titer-models/src/validation-sims/fluvacs/')
-
-
+# setwd('C:/Users/15636/Dropbox (University of Michigan)/hai-titer-models/src/validation-sims/fluvacs/')
+setwd('~/Dropbox (University of Michigan)/fluvacs_analysis/')
 
 fr <- readRDS('results/full_age_wane_res.rds')
 or <- readRDS('results/ols_age_wane_res.rds')
@@ -111,3 +108,24 @@ ggplot(df, aes(mu, resid)) +
 ggplot(df, aes(resid, group=y)) +
     geom_density() +
     facet_wrap(. ~ y, ncol=4)
+
+
+# tables
+
+fr <- readRDS('results/full_age_wane_res.rds')
+or <- readRDS('results/ols_age_wane_res.rds')
+
+beta_cens <- rstan::extract(fr, c('beta_treat', 'k0', 'k')) %>%
+    do.call(cbind, .)
+mu_cens <- round(apply(beta_cens, 2, mean), 2)
+se_cens <- round(apply(beta_cens, 2, sd), 2)
+bds_cens <- round(t(apply(beta_cens, 2, quantile, p = c(.05, .95))), 2)
+
+beta_mem <- rstan::extract(or, c('beta_treat', 'k0', 'k')) %>%
+    do.call(cbind, .)
+mu_mem <- round(apply(beta_mem, 2, mean), 2)
+se_mem <- round(apply(beta_mem, 2, sd), 2)
+bds_mem <- round(t(apply(beta_mem, 2, quantile, p = c(.05, .95))), 2)
+
+
+cbind(mu_cens, se_cens, bds_cens, mu_mem, se_mem, bds_mem)

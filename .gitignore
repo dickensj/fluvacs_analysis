@@ -1,3 +1,4 @@
 # files to ignore
 results/stan_fit/*
 results/chains/*
+results/*.rds
