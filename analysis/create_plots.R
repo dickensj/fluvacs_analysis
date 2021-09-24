@@ -9,8 +9,8 @@ library(cmdstanr)
 library(posterior)
 rstan_options(auto_write=T)
 
-# setwd('C:/Users/15636/Dropbox (University of Michigan)/hai-titer-models/src/validation-sims/fluvacs/')
-setwd('~/Dropbox (University of Michigan)/fluvacs_analysis/')
+setwd('C:/Users/15636/Documents/GitHub/fluvacs_analysis/')
+# setwd('~/Dropbox (University of Michigan)/fluvacs_analysis/')
 
 fr <- readRDS('results/full_age_wane_res.rds')
 or <- readRDS('results/ols_age_wane_res.rds')
@@ -85,7 +85,7 @@ ggplot(design, aes(18 + 10 * age, log(2) / wane_rate, color=factor(vaxcode))) +
 
 
 # fitted values
-dat <- read_rdump('fluvacs.data.R')
+dat <- read_rdump('data/fluvacs.data.R')
 ymat <- dat$y
 
 est_mu <- rstan::extract(fr, 'ev')[[1]]
@@ -121,6 +121,12 @@ mu_cens <- round(apply(beta_cens, 2, mean), 2)
 se_cens <- round(apply(beta_cens, 2, sd), 2)
 bds_cens <- round(t(apply(beta_cens, 2, quantile, p = c(.05, .95))), 2)
 
+npar <- length(mu_cens)
+cens_summary <- sapply(1:npar, function(i) {
+    stringr::str_c(mu_cens[i], ' (', bds_cens[i,1], ', ', bds_cens[i, 2], ')')
+})
+
+
 beta_mem <- rstan::extract(or, c('beta_treat', 'k0', 'k')) %>%
     do.call(cbind, .)
 mu_mem <- round(apply(beta_mem, 2, mean), 2)
@@ -128,4 +134,8 @@ se_mem <- round(apply(beta_mem, 2, sd), 2)
 bds_mem <- round(t(apply(beta_mem, 2, quantile, p = c(.05, .95))), 2)
 
 
-cbind(mu_cens, se_cens, bds_cens, mu_mem, se_mem, bds_mem)
+npar <- length(mu_mem)
+mem_summary <- sapply(1:npar, function(i) {
+    stringr::str_c(mu_mem[i], ' (', bds_mem[i,1], ', ', bds_mem[i, 2], ')')
+})
+xtable::xtable(cbind(cens_summary,mem_summary))
