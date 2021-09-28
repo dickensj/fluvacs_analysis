@@ -9,14 +9,25 @@ library(cmdstanr)
 library(posterior)
 rstan_options(auto_write=T)
 
-setwd('C:/Users/15636/Documents/GitHub/fluvacs_analysis/')
-# setwd('~/Dropbox (University of Michigan)/fluvacs_analysis/')
+#setwd('C:/Users/15636/Documents/GitHub/fluvacs_analysis/')
+setwd('~/Dropbox (University of Michigan)/fluvacs_analysis/')
 
 fr <- readRDS('results/full_age_wane_res.rds')
 or <- readRDS('results/ols_age_wane_res.rds')
 
 print(fr, 'alpha0')
 print(fr, 'k')
+
+pairs(fr, pars = 'k')
+k <- rstan::extract(fr, pars = 'k')[[1]]
+b1 <- c(0, 0, 1, 0, 0)
+b2 <- c(1, 0, 1, 0, 1)
+summary(k %*% (b1 - b2))
+
+bboost <- rstan::extract(fr, pars = 'beta')[[1]]
+b1 <- c(0, 0, 1, 0, 0)
+b2 <- c(1, 0, 1, 0, 1)
+summary(k %*% (b1 - b2))
 
 # what are the boosting effects by age
 
